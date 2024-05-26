@@ -1,10 +1,11 @@
-//el codigo esta incompleto
 let elementUsername = document.getElementById('username');
 let elementPassword = document.getElementById('password');
+let registerButton = document.getElementById('register');
+
 elementUsername.addEventListener("change", checkUsername);
 elementPassword.addEventListener("change", checkPassword);
+registerButton.addEventListener("click", registerUser);
 
-//estas variables son potencialmente innecesarias
 let usernameCondition = false;
 let passwordCondition = false;
 
@@ -14,77 +15,84 @@ function checkUsername() {
     console.log(valueUsername);
     //se verifica la longitud del nombre y luego envio el nombre  
     if (valueUsername.length < 4) {
-        document.getElementById('usernameFeedback').innerHTML = "The username nees more than 4 characters";
+        document.getElementById('usernameFeedback').innerHTML = "The username has less than 4 characters";
         document.getElementById('usernameFeedback').style.color = "red";
         usernameCondition = false;
     } else if (valueUsername.length > 12) {
-        document.getElementById('usernameFeedback').innerHTML = "The username need less than 12 characters";
+        document.getElementById('usernameFeedback').innerHTML = "The username has more than 12 characters";
         document.getElementById('usernameFeedback').style.color = "red";
         usernameCondition = false;
     } else {
+        //consulta asincronica
         fetch('include/verify-username.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'user': valueUsername
-            })
+            body: JSON.stringify({ 'user': valueUsername })
         })
-
-        //el valor que vuelve del php es verdadero o falso, en base a esto continuo 
+        //el valor que vuelve del php es verdadero o falso
         .then(response => response.json())
         .then(data => {
+            //informamos al usuario
             if (data.occupied) {
-                //informamos al usuario si se encuentra ocupado
-                document.getElementById('usernameFeedback').innerHTML = "Already Exist";
+                document.getElementById('usernameFeedback').innerHTML = "The username is already in use";
                 document.getElementById('usernameFeedback').style.color = "red";
-                //cambiamos el valor de condicion del campo
                 usernameCondition = false;
-                //ejecutamos la funcion de chequear campos
-                registerButtonCheck();
             } else {
-                //informamos al usuario si el nombre esta bien
                 document.getElementById('usernameFeedback').innerHTML = "OK";
                 document.getElementById('usernameFeedback').style.color = "green";
-                //cambiamos el valor de condicion del campo
                 usernameCondition = true;
-                //ejecutamos la funcion de chequear campos
-                registerButtonCheck();
             }
-        })
+            //llamamos a la funcion para comprobar ambos campos
+            registerButtonCheck();
+        });
     }
 }
+
 function checkPassword() {
-    //obtenemos el valor de contraseña
+    //obtenemos el valor de la contraseña
     let valuePassword = elementPassword.value;
+    //se verifica la longitud de la contraseña
     if (valuePassword.length < 8) {
-        //informar si es menor a 8 caracteres
-        document.getElementById('passwordFeedback').innerHTML = "Too Short";
+        document.getElementById('passwordFeedback').innerHTML = "The password needs at least 8 characters";
         document.getElementById('passwordFeedback').style.color = "red";
-        //cambiamos el valor de condicion del campo
         passwordCondition = false;
-        //ejecutamos la funcion de chequear campos
-        registerButtonCheck()
     } else {
-        //informar que la contraseña esta bien
         document.getElementById('passwordFeedback').innerHTML = "OK";
         document.getElementById('passwordFeedback').style.color = "green";
-        //cambiamos el valor de condicion del campo
         passwordCondition = true;
-        //ejecutamos la funcion de chequear campos
-        registerButtonCheck()
     }
+    
+    //llamamos a la funcion para comprobar ambos campos
+    registerButtonCheck();
 }
+
+
 function registerButtonCheck() {
-    //si las condiciones de los campos son ambas verdaderas entonces habilitar el boton
-    if (usernameCondition == true && passwordCondition == true) {
-        //informar en la consola
-        console.log("Register OK")
-        document.getElementById('register').disabled = false;
+    if (usernameCondition && passwordCondition) {
+        console.log("OK")
+        registerButton.disabled = false;
     } else {
-        //informar en la consola
-        console.log("Register Disabled")
-        document.getElementById('register').disabled = true;
+        console.log("DISABLED")
+        registerButton.disabled = true;
     }
 }
+
+function registerUser(event) {
+    event.preventDefault();
+    let username = elementUsername.value;
+    let password = elementPassword.value;
+    //consulta asincronica
+    fetch('include/register-user.php', {
+        method: 'POST',
+        //stringfy convierte un objeto de javascript en JSON
+        body: JSON.stringify({ username: username, password: password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("User registered");
+        } else {
+            alert("Error registering user: " + data.error);
+        }
+    });
+}
+//me hago como el que escribo en ingles pero me cuesta horrores mantener una conversacion hasta en español
