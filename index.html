@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <script defer src="js/sign-up.js"></script>
+    <!--Solo por el error en la consola-->
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="form-1">
+        <form id="registerForm">
+            <div class="darker">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <span id="usernameFeedback" style="color: red;">ㅤ</span>
+            <div class="darker">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <span id="passwordFeedback" style="color: red;">ㅤ</span>
+            <br><button type="submit" id="register" disabled="true">Register</button>
+        </form>
+    </div>
+</body>
+</html>
